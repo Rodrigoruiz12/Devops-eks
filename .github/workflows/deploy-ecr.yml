@@ -1,0 +1,71 @@
+name: Pipeline ECR Completo
+
+on:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  # TRABAJO 1: Compilar los 7 Microservicios en paralelo
+  build-backend:
+    name: Compilar Backend
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        servicio: [eureka-server, api-gateway, usuarios, reportes, monitoreo, alertas, historial]
+    steps:
+    - name: Checkout del código
+      uses: actions/checkout@v3
+
+    - name: Configurar AWS
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+        aws-region: us-east-1
+
+    - name: Login a Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Build y Push Backend
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: bomberos-${{ matrix.servicio }}
+        IMAGE_TAG: latest
+      working-directory: ./bomberos/${{ matrix.servicio }}
+      run: |
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+  # TRABAJO 2: Compilar el Frontend
+  build-frontend:
+    name: Compilar Frontend
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout del código
+      uses: actions/checkout@v3
+
+    - name: Configurar AWS
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+        aws-region: us-east-1
+
+    - name: Login a Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Build y Push Frontend
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: bomberos-frontend
+        IMAGE_TAG: latest
+      working-directory: ./fron_semestralFS3
+      run: |
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG

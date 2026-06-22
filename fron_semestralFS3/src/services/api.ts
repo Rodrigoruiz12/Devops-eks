@@ -1,6 +1,6 @@
 import { Alerta, Usuario, ZonaMonitoreo, Historial, Reporte, ReporteBackend } from '../types';
 
-const API_BASE_URL = 'http://3.239.40.144:9090'; 
+const API_BASE_URL = 'http://bomberos-alb-828173309.us-east-1.elb.amazonaws.com:9090'; 
 
 // Función auxiliar para obtener las cabeceras incluyendo la forma de enviar el token (Bearer)
 const getAuthHeaders = () => {

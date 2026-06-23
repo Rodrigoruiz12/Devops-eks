@@ -66,7 +66,7 @@ export const AlertasPage = () => {
   return (
     <div className="p-8">
       <div className="flex flex-col mb-8">
-        <h2 className="text-2xl font-bold text-pure-white">Gestión de Alertas Activas v.2</h2>
+        <h2 className="text-2xl font-bold text-pure-white">Gestión de Alertas Activas</h2>
         <p className="text-[#8E8E93] text-sm mt-1">Finaliza incidentes para moverlos al registro histórico</p>
       </div>
       
